@@ -1,3 +1,4 @@
+import { icon, walletName } from './icon';
 import { registerWallet } from './register';
 import { TrustWallet } from './wallet';
 import type { Trust } from './window';
@@ -7,3 +8,4 @@ function initialize(trust: Trust): void {
 }
 
 export default initialize;
+export { icon, walletName }

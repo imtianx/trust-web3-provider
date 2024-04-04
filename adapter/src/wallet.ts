@@ -33,7 +33,7 @@ import {
 } from '@wallet-standard/features';
 import bs58 from 'bs58';
 import { TrustWalletAccount } from './account';
-import { icon } from './icon';
+import { icon, walletName } from './icon';
 import type { SolanaChain } from './solana';
 import { isSolanaChain, isVersionedTransaction, SOLANA_CHAINS } from './solana';
 import { bytesEqual } from './util';
@@ -50,7 +50,7 @@ export type TrustFeature = {
 export class TrustWallet implements Wallet {
     readonly #listeners: { [E in StandardEventsNames]?: StandardEventsListeners[E][] } = {};
     readonly #version = '1.0.0' as const;
-    readonly #name = 'Trust' as const;
+    readonly #name = walletName;
     readonly #icon = icon;
     #account: TrustWalletAccount | null = null;
     readonly #trust: Trust;
@@ -239,11 +239,11 @@ export class TrustWallet implements Wallet {
             const serializedTransaction = isVersionedTransaction(signedTransaction)
                 ? signedTransaction.serialize()
                 : new Uint8Array(
-                      (signedTransaction as Transaction).serialize({
-                          requireAllSignatures: false,
-                          verifySignatures: false,
-                      })
-                  );
+                    (signedTransaction as Transaction).serialize({
+                        requireAllSignatures: false,
+                        verifySignatures: false,
+                    })
+                );
 
             outputs.push({ signedTransaction: serializedTransaction });
         } else if (inputs.length > 1) {
@@ -269,11 +269,11 @@ export class TrustWallet implements Wallet {
                     const serializedTransaction = isVersionedTransaction(signedTransaction)
                         ? signedTransaction.serialize()
                         : new Uint8Array(
-                              (signedTransaction as Transaction).serialize({
-                                  requireAllSignatures: false,
-                                  verifySignatures: false,
-                              })
-                          );
+                            (signedTransaction as Transaction).serialize({
+                                requireAllSignatures: false,
+                                verifySignatures: false,
+                            })
+                        );
 
                     return { signedTransaction: serializedTransaction };
                 })

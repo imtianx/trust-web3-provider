@@ -13,6 +13,7 @@ class BaseProvider extends EventEmitter {
     super();
     this.isDebug = !!config.isDebug;
     this.isTrust = true;
+    this.isComingChat = true;
   }
 
   /**
@@ -53,7 +54,7 @@ class BaseProvider extends EventEmitter {
   /**
    * @private Internal native error -> js
    */
-   sendError(id, error) {
+  sendError(id, error) {
     console.log(`<== ${id} sendError ${error}`);
     let callback = this.callbacks.get(id);
     if (callback) {
