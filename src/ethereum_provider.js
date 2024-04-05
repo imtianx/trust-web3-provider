@@ -13,6 +13,8 @@ import IdMapping from "./id_mapping";
 import isUtf8 from "isutf8";
 import { TypedDataUtils, SignTypedDataVersion } from "@metamask/eth-sig-util";
 import BaseProvider from "./base_provider";
+import { v4 as uuidv4 } from 'uuid';
+import { icon, walletName } from './adapter';
 
 class TrustWeb3Provider extends BaseProvider {
   constructor(config) {
@@ -26,6 +28,29 @@ class TrustWeb3Provider extends BaseProvider {
     this.isMetaMask = !!config.ethereum.isMetaMask;
 
     this.emitConnect(this.chainId);
+    // regist eip6963
+    this.registerProvider(this);
+  }
+
+  registerProvider(provider) {
+    window.addEventListener("eip6963:requestProvider", () => {
+      this.announceProvider(provider);
+    });
+    this.announceProvider(provider);
+  }
+
+  announceProvider(provider) {
+    const info = {
+      uuid: uuidv4(),
+      name: walletName,
+      icon: icon,
+      rdns: "chat.coming.wallet"
+    };
+    window.dispatchEvent(
+      new CustomEvent("eip6963:announceProvider", {
+        detail: Object.freeze({ info, provider }),
+      })
+    );
   }
 
   setAddress(address) {
