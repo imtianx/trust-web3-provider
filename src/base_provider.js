@@ -62,6 +62,12 @@ class BaseProvider extends EventEmitter {
       this.callbacks.delete(id);
     }
   }
+
+  printLog(message) {
+    if (this.isDebug) {
+      console.warn(message);
+    }
+  }
 }
 
 module.exports = BaseProvider;

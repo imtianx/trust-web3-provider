@@ -15,7 +15,7 @@
   "license": "MIT",
   "scripts": {
     "prebuild": "cd ../adapter && npm i && npm run build && mv ./dist/index.js ../src/adapter.js",
-    "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js",
+    "build": "npx browserify index.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > ../dist/trust-min.js && cp ../dist/trust-min.js ../dist/trust_min.js",
     "prepare-publish": "mkdir -p dist && cp ../dist/trust-min.js ./dist/trust-min.js",
     "publish-npm-package": "npm run prepare-publish && npm publish --access public",
     "lint": "eslint . --fix",
