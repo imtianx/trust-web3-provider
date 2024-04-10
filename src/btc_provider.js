@@ -18,7 +18,7 @@ const BtcNetworks = {
 class TrustBtcWeb3Provider extends BaseProvider {
   constructor(config) {
     super(config);
-    this.providerNetwork = BtcNetworks.mainnet;
+    this.providerNetwork = "bitcoin";
     this.callbacks = new Map();
     this._isConnected = false;
 
@@ -35,6 +35,7 @@ class TrustBtcWeb3Provider extends BaseProvider {
   setAddress(address) {
     this.address = address;
     this.ready = !!address;
+    this._isConnected = true;
   }
 
   connect() {
@@ -93,31 +94,31 @@ class TrustBtcWeb3Provider extends BaseProvider {
     if (type !== "ecdsa" && type !== "bip322-simple") {
       throw Error("Invida params, only support type is: ecdsa | bip322-simple")
     }
-    // todo 
-    return this._request("signMessage", { data: message, type: type })
+    return this._request("signMessage", { data: message, type: type }).then((response) => {
+      return response;
+    });
   }
 
   signPsbt(psbtHex) {
-    this._request("signPsbt", { tx: psbtHex })
-      .then((hex) => {
-        this.printLog(hex)
-        return JSON.parse(Utils.messageToBuffer(hex).toString());
-      });
+    return this._request("signPsbt", { tx: psbtHex }).then((response) => {
+      this.printLog(response)
+      return response;
+    });
   }
 
   pushPsbt(psbtHex) {
-    this._request("pushPsbt", { tx: psbtHex })
-      .then((hex) => {
-        this.printLog(hex)
-        return JSON.parse(Utils.messageToBuffer(hex).toString());
+    return this._request("pushPsbt", { tx: psbtHex })
+      .then((response) => {
+        this.printLog(response)
+        return response
       });
   }
 
   pushTx(signedTx) {
-    this._request("submitTransaction", { tx: signedTx })
-      .then((hex) => {
-        this.printLog(hex)
-        return JSON.parse(Utils.messageToBuffer(hex).toString());
+    return this._request("submitTransaction", { tx: signedTx })
+      .then((response) => {
+        this.printLog(response)
+        return response;
       });
   }
 
