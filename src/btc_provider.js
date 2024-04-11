@@ -12,7 +12,7 @@ import Utils from "./utils";
 const BtcNetworks = {
   mainnet: "livenet", // mainnet
   testnet: "testnet",
-  segnit: "segnit",
+  segnet: "segnet",
 }
 
 class TrustBtcWeb3Provider extends BaseProvider {
@@ -27,7 +27,7 @@ class TrustBtcWeb3Provider extends BaseProvider {
     } catch (error) {
       console.log(error);
     }
-    if (!(this._network in BtcNetworks)) {
+    if (!Object.values(BtcNetworks).includes(this._network)) {
       this._network = BtcNetworks.mainnet;
     }
   }
@@ -62,7 +62,8 @@ class TrustBtcWeb3Provider extends BaseProvider {
   account() {
     return this._request("requestAccounts", { network: this._network }).then((data) => {
       this.setAddress(data[0]);
-      this.printLog(data)
+      this.printLog(data);
+      this.emitAccountChanged(data);
       return data;
     });
   }
@@ -84,15 +85,20 @@ class TrustBtcWeb3Provider extends BaseProvider {
   }
 
   switchNetwork(network) {
-    if (!(network in BtcNetworks)) {
-      throw Error(`cur network is: ${network},only support networl is :${BtcNetworks}`)
+    if (!Object.values(BtcNetworks).includes(network)) {
+      throw Error(`cur network is: ${network},only support networks are :${Object.keys(BtcNetworks).join(', ')}}`)
     }
-    this._request("switchNetwork", { network: network })
+    return this._request("switchNetwork", { network: network }).then((response) => {
+      this.printLog(response);
+      this._network = response;
+      this.emitNetworkChanged(response);
+      return response;
+    });
   }
 
   signMessage(message, type = "ecdsa") {
     if (type !== "ecdsa" && type !== "bip322-simple") {
-      throw Error("Invida params, only support type is: ecdsa | bip322-simple")
+      throw Error("Invalid params, only support type is: ecdsa | bip322-simple")
     }
     return this._request("signMessage", { data: message, type: type }).then((response) => {
       return response;
@@ -100,26 +106,34 @@ class TrustBtcWeb3Provider extends BaseProvider {
   }
 
   signPsbt(psbtHex) {
-    return this._request("signPsbt", { tx: psbtHex }).then((response) => {
-      this.printLog(response)
+    return this._request("signPsbt", { data: psbtHex }).then((response) => {
+      this.printLog(response);
       return response;
     });
   }
 
   pushPsbt(psbtHex) {
-    return this._request("pushPsbt", { tx: psbtHex })
+    return this._request("pushPsbt", { data: psbtHex })
       .then((response) => {
-        this.printLog(response)
+        this.printLog(response);
         return response
       });
   }
 
   pushTx(signedTx) {
-    return this._request("submitTransaction", { tx: signedTx })
+    return this._request("submitTransaction", { data: signedTx })
       .then((response) => {
-        this.printLog(response)
+        this.printLog(response);
         return response;
       });
+  }
+
+  emitAccountChanged(data) {
+    this.emit("accountsChanged", data);
+  }
+
+  emitNetworkChanged(network) {
+    this.emit("networkChanged", network);
   }
 
   /**
